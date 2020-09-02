@@ -1,3 +1,7 @@
+/*
+Компоненты для футера форм перед отправкой которых требуется капча
+*/
+
 let Button = MaterialUI.Button,
     Dialog = MaterialUI.Dialog,
     DialogActions = MaterialUI.DialogActions,

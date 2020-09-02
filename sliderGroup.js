@@ -1,3 +1,7 @@
+/*
+Кастомный слайдер
+*/
+
 $("head").append('<script src="/vendor/react-modules/react-components/rangeslider.min.js"></script>');
 $("head").append('<link rel="stylesheet" href="/vendor/react-modules/react-components/rangeslider.min.css"/> ');
 

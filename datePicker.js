@@ -1,3 +1,7 @@
+/*
+Кастомный датаПикер реализованный(по просьбе) с использованием уже существующей библиотеки (jquery)
+*/
+
 let TextField = MaterialUI.TextField
 
 window.reactElements.DatePicker = class DatePicker extends React.Component {

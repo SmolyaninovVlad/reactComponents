@@ -1,3 +1,7 @@
+/*
+Кастомный компонент на замену стандартных чекбоксов в настройках (например в кредитном калькуляторе)
+*/
+
 let _MaterialUI = MaterialUI,
     withStyles  = _MaterialUI.withStyles,
     Switch = _MaterialUI.Switch;

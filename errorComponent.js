@@ -1,3 +1,9 @@
+/*
+Компонент для отлова ошибок в дочерних компонентах 
+и для вывод аварийного интерфейса для минимального взаимодействия с пользователем
+*/
+
+
 let ErrorInfoDialog = (props) => {
   const [open, setOpen] = React.useState(false);
   const [scroll, setScroll] = React.useState('paper');
