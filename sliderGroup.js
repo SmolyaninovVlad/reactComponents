@@ -1,7 +1,3 @@
-/*
-Кастомный слайдер
-*/
-
 $("head").append('<script src="/vendor/react-modules/react-components/rangeslider.min.js"></script>');
 $("head").append('<link rel="stylesheet" href="/vendor/react-modules/react-components/rangeslider.min.css"/> ');
 
@@ -19,88 +15,86 @@ $("head").append('<link rel="stylesheet" href="/vendor/react-modules/react-compo
 */
 
 
-window.reactElements.SliderGroup = class SliderGroup extends React.Component {
-    constructor(props) {
-        super(props);
-        this.inputHandleChange = this.inputHandleChange.bind(this)
-        this.sliderChangeHandler = this.sliderChangeHandler.bind(this)
-        this.inputValidate = this.inputValidate.bind(this)
-        this.inputFormat = this.inputFormat.bind(this)
-        this.numberFormat = this.numberFormat.bind(this)
-    }
-    sliderChangeHandler(event){
-        let elem = this.props.name?document.getElementsByName(this.props.name)[0]:false
-        if (elem) elem.setAttribute("style", "");
-        let value = this.inputFormat(event)
+window.reactElements.SliderGroup = (props) => {
+    const [inputValue, setInputValue] = React.useState(props.inputValue)
+    const [addClass, setAddClass] = React.useState('')
+    React.useEffect(()=>{
+        if (inputValue<props.min) setInputValue(numberFormat(props.min))
+        else if (inputValue>props.max) setInputValue(numberFormat(props.max))
 
-        //Если внешняя функция передана то выполняем изменение внешнего параметра
-        if (this.props.function && this.props.functionKey){
-            this.props.function(this.numberFormat(value), this.props.functionKey)
-        }
-    }
+    }, [props.min, props.max])
 
-    inputHandleChange(event){
-        event.target.setAttribute("style", "");
-        let value = this.inputFormat(event.target.value)
-        if (this.numberFormat(value)>this.props.max) {
+    React.useEffect(()=>{
+        if (numberFormat(inputValue)<numberFormat(props.min)) setAddClass("input_invalid") 
+        else setAddClass("") 
+    }, [inputValue])
+
+    const inputHandleChange = (event) => {
+        let value = inputFormat(event.target.value)
+        if (numberFormat(value)>props.max) {
 
             //Если внешняя функция передана то выполняем изменение внешнего параметра
-            if (this.props.function && this.props.functionKey){
-                this.props.function(this.props.max, this.props.functionKey)
+            if (props.function && props.functionKey){
+                props.function(props.max, props.functionKey)
             }
+            setInputValue(numberFormat(props.max))
         }
-            else {
-                //Если внешняя функция передана то выполняем изменение внешнего параметра
-                if (this.props.function && this.props.functionKey){
-                    this.props.function(this.numberFormat(value), this.props.functionKey)
-                }
+        else {
+            //Если внешняя функция передана то выполняем изменение внешнего параметра
+            if (props.function && props.functionKey){
+                props.function(numberFormat(value), props.functionKey)
             }
-               
+            setInputValue(numberFormat(value))
+        }
     }
 
-    numberFormat(string){
+    const numberFormat = (string) => {
         string = String(string)
         return Number(string.replace(/\s+/g,''))
     }
 
-    inputFormat(value){
+    const inputFormat = (value) => {
         value = String(value)
         value = value.replace(/[^0-9]/g,'');
         value = value.replace(/^0+(.*)$/,'0$1');
         value = value.replace(/^0([^.].*)$/,'$1');
-        if (this.props.isMoney) value = value.replace(/(\d)(?=(\d{3})+([^\d]|$))/g, "$1 ");  
+        if (props.isMoney) value = value.replace(/(\d)(?=(\d{3})+([^\d]|$))/g, "$1 ");  
         return value
     }
 
-    inputValidate(event){
+    const inputValidate = (event) => {
         //кастомная валидация
-        if (this.numberFormat(event.target.value)<this.numberFormat(this.props.min)) {
+        if (numberFormat(event.target.value)<numberFormat(props.min)) {
 
             //Если внешняя функция передана то выполняем изменение внешнего параметра
-            if (this.props.function && this.props.functionKey){
-                this.props.function(this.inputFormat(this.props.min), this.props.functionKey)
+            if (props.function && props.functionKey){
+                props.function(props.min, props.functionKey)
             }
-        }
-        if (this.numberFormat(event.target.value)>this.numberFormat(this.props.max)) {
-
-            //Если внешняя функция передана то выполняем изменение внешнего параметра
-            if (this.props.function && this.props.functionKey){
-                this.props.function(this.props.max, this.props.functionKey)
-            }
+            setInputValue(numberFormat(props.min))
         }
     }
 
-    render(){
-        return(
-            <div className="form-group mb-0">
-            <label>{this.props.label}</label>
-            <input type="text" value={this.inputFormat(this.props.inputValue)} name={this.props.name? this.props.name : ""}  onBlur={this.inputValidate} onChange={this.inputHandleChange} className={"form-control form-control-lg "+(this.props.isMoney && "currency currency__rub")}/>
-            {this.props.percentOf &&
+    const sliderChangeHandler = (event) => {
+        let elem = props.name?document.getElementsByName(props.name)[0]:false
+        if (elem) elem.setAttribute("style", "");
+        let value = inputFormat(event)
+
+        //Если внешняя функция передана то выполняем изменение внешнего параметра
+        if (props.function && props.functionKey){
+            props.function(numberFormat(value), props.functionKey)
+        }
+        setInputValue(numberFormat(value))
+    }
+
+    return (
+        <div className="form-group mb-0">
+            <label>{props.label}</label>
+            <input type="text" value={inputFormat(inputValue)} name={props.name? props.name : ""}  onBlur={inputValidate} onChange={inputHandleChange} className={`form-control form-control-lg ${props.isMoney && "currency currency__rub"} ${addClass}`}/>
+            {props.percentOf &&
                 <span className="sliderPercentLabel">
-                    {Math.round(this.numberFormat(this.props.inputValue)/this.props.percentOf * 100)}%
+                    {Math.round(numberFormat(inputValue)/props.percentOf * 100)}%
                 </span>
             }
-
             <div className="slider slider-horizontal">
                 <div className="tooltip tooltip-min top hide" role="presentation">
                     <div className="tooltip-arrow"></div>
@@ -112,25 +106,23 @@ window.reactElements.SliderGroup = class SliderGroup extends React.Component {
                 </div>
                 <div className='slider'>
                     <ReactRangeslider.default                        
-                        min={this.props.min}
-                        max={this.props.max}
-                        step={this.props.step}
-                        value={parseInt(String(this.props.inputValue).replace(/[^0-9.]/gim, ""))}
-                        onChange={this.sliderChangeHandler}
+                        min={props.min}
+                        max={props.max}
+                        step={props.step}
+                        value={parseInt(String(inputValue).replace(/[^0-9.]/gim, ""))}
+                        onChange={sliderChangeHandler}
                     />
                 </div>
             </div>
             <div className="slider-range">
-                <span> {this.props.min.toLocaleString()} </span>
-                {this.props.percentOf && Math.round(this.numberFormat(this.props.inputValue)/this.props.percentOf * 100)<20 &&
+                <span> {props.min.toLocaleString()} </span>
+                {props.percentOf && Math.round(numberFormat(inputValue)/props.percentOf * 100)<20 &&
                 <span className="sliderAdditionalPercentLabel">
                     Снизьте ставку, увеличив первоначальный взнос до 20%
                 </span>
                 }
-                <span> {this.props.max.toLocaleString()} </span>
-
+                <span> {props.max.toLocaleString()} </span>
             </div>
-            </div>
-        )
-    }
+        </div>
+    )
 }
